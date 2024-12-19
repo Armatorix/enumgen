@@ -1,0 +1,38 @@
+// DO NOT EDIT: auto generated from ddwrap
+
+package {{ .PackageName }}
+
+func (e {{ .EnumName }}) String() string {
+    switch e {
+    {{ range .Values }}case {{ .Value }}:
+        return "{{ .Name }}"
+    {{ end }}default:
+        return "Unknown"
+    }
+}
+
+func (e {{ .EnumName }}) MarshalJSON() ([]byte, error) {
+    return json.Marshal(e.String())
+}
+
+func (e *{{ .EnumName }}) UnmarshalJSON(data []byte) error {
+    var s string
+    if err := json.Unmarshal(data, &s); err != nil {
+        return err
+    }
+    switch s {
+    {{ range .Values }}case "{{ .Name }}":
+        *e = {{ .Value }}
+    {{ end }}default:
+        *e = 0
+    }
+    return nil
+}
+
+func {{ .EnumName}}Values() []{{ .EnumName }} {
+    return []{{ .EnumName }}{
+    {{ range .Values }}{{ .Value }},
+    }
+}
+
+{{ end }}
