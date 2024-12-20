@@ -15,6 +15,8 @@ func (e StringConstType) String() string {
 		return "Const2"
 	case Const3:
 		return "Const3"
+	case MixedStringConstTypePlacement:
+		return "MixedStringConstTypePlacement"
 	default:
 		return "Unknown"
 	}
@@ -36,6 +38,8 @@ func (e *StringConstType) UnmarshalJSON(data []byte) error {
 		*e = Const2
 	case "Const3":
 		*e = Const3
+	case "MixedStringConstTypePlacement":
+		*e = MixedStringConstTypePlacement
 	default:
 		return fmt.Errorf("Unknown StringConstType value: %+v", s)
 	}
@@ -47,6 +51,7 @@ func StringConstTypeValues() []StringConstType {
 		Const1,
 		Const2,
 		Const3,
+		MixedStringConstTypePlacement,
 	}
 }
 
@@ -57,6 +62,8 @@ func (e StringConstType) IsValid() bool {
 	case Const2:
 		return true
 	case Const3:
+		return true
+	case MixedStringConstTypePlacement:
 		return true
 	default:
 		return false
