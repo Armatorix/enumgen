@@ -44,3 +44,33 @@ func (e {{ .EnumName }}) IsValid() bool {
         return false
     }
 }
+
+// valuer and scanner for database/sql
+
+func (e {{ .EnumName }}) Value() (driver.Value, error) {
+    return e.String(), nil
+}
+
+var ErrMissingValue = errors.New("missing value")
+
+func (e *{{ .EnumName }}) Scan(value interface{}) error {
+    if value == nil {
+        return ErrMissingValue
+    }
+    switch v := value.(type) {
+    case []byte:
+        return e.UnmarshalJSON(v)
+    case string:
+        return e.UnmarshalJSON([]byte(v))
+    case int64:
+        *e, ok = {{ .EnumName }}(v)
+        if !ok {
+            return fmt.Errorf("Unknown {{ .EnumName }} value: %+v", v)
+        }
+        return nil
+    
+    default:
+        return fmt.Errorf("Unsupported type: %T", v)
+    }
+}
+`

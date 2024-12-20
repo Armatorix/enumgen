@@ -13,10 +13,20 @@ import (
 	"golang.org/x/tools/imports"
 )
 
+type FunctionsEnabled struct {
+	MarshalJSON   bool
+	UnmarshalJSON bool
+	String        bool
+	Values        bool
+	IsValid       bool
+}
+
+// TODO: move values to name/value pair with option to pick one or the other for functions
 type TemplateValues struct {
-	PackageName string
-	EnumName    string
-	Values      []string
+	PackageName      string
+	EnumName         string
+	Values           []string
+	FunctionsEnabled FunctionsEnabled
 }
 
 //go:embed tmpl/*
