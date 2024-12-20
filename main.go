@@ -25,7 +25,7 @@ var tmpls embed.FS
 func main() {
 	args := os.Args[1:]
 	if len(args) != 3 {
-		fmt.Println("Usage: go run constant_type_name input_file.go output_file.go")
+		fmt.Println("Usage: enumgen constant_type_name input_file.go output_file.go")
 		os.Exit(1)
 	}
 	mainFn(args[0], args[1], args[2])
