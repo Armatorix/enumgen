@@ -14,8 +14,9 @@ import (
 )
 
 type TemplateValues struct {
-	EnumName string
-	Values   []string
+	PackageName string
+	EnumName    string
+	Values      []string
 }
 
 //go:embed tmpl/*
@@ -44,25 +45,39 @@ func mainFn(inputFilePath, outputFilePath, outputPackage string) {
 	}
 
 	templateValues := TemplateValues{
-		EnumName: outputPackage,
-		Values:   []string{},
+		PackageName: node.Name.Name,
+		EnumName:    outputPackage,
+		Values:      []string{},
 	}
 
+	// list over const values
 	for _, decl := range node.Decls {
-		ast.Inspect(decl, func(n ast.Node) bool {
-			x, ok := n.(*ast.GenDecl)
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok {
+			continue
+		}
+		if genDecl.Tok != token.CONST {
+			continue
+		}
+
+		// NOTE: need to handle multiple enum types
+		currentType := ""
+		for _, spec := range genDecl.Specs {
+			valueSpec, ok := spec.(*ast.ValueSpec)
 			if !ok {
-				return true
+				continue
 			}
-			for _, spec := range x.Specs {
-				if ts, ok := spec.(*ast.TypeSpec); ok {
-					if iface, ok := ts.Type.(*ast.InterfaceType); ok {
-						fmt.Println(iface)
-					}
-				}
+			if len(valueSpec.Names) != 1 {
+				continue
 			}
-			return true
-		})
+			if valueSpec.Type != nil {
+				currentType = valueSpec.Type.(*ast.Ident).Name
+			}
+			if currentType != templateValues.EnumName {
+				continue
+			}
+			templateValues.Values = append(templateValues.Values, valueSpec.Names[0].Name)
+		}
 	}
 
 	outFile, err := os.OpenFile(outputFilePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)

@@ -1,11 +1,11 @@
-// DO NOT EDIT: auto generated from ddwrap
+// DO NOT EDIT: auto generated from github.com/Armatorix/enumgen
 
 package {{ .PackageName }}
 
 func (e {{ .EnumName }}) String() string {
     switch e {
-    {{ range .Values }}case {{ .Value }}:
-        return "{{ .Name }}"
+    {{ range .Values }}case {{ . }}:
+        return "{{ . }}"
     {{ end }}default:
         return "Unknown"
     }
@@ -21,18 +21,26 @@ func (e *{{ .EnumName }}) UnmarshalJSON(data []byte) error {
         return err
     }
     switch s {
-    {{ range .Values }}case "{{ .Name }}":
-        *e = {{ .Value }}
+    {{ range .Values }}case "{{ . }}":
+        *e = {{ . }}
     {{ end }}default:
-        *e = 0
+        return fmt.Errorf("Unknown {{ .EnumName }} value: %+v", s)
     }
     return nil
 }
 
 func {{ .EnumName}}Values() []{{ .EnumName }} {
     return []{{ .EnumName }}{
-    {{ range .Values }}{{ .Value }},
+    {{ range .Values }}{{ . }},
+    {{ end }}
     }
 }
 
-{{ end }}
+func (e {{ .EnumName }}) IsValid() bool {
+    switch e {
+    {{ range .Values }}case {{ . }}:
+        return true
+    {{ end }}default:
+        return false
+    }
+}
