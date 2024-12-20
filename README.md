@@ -1,6 +1,6 @@
 # enumgen
 
-![enumgen logo](./image.png)
+![enumgen logo](./image.png){ width=20% }
 
 enumgen is a tool for generating enum-like functionalities in golang language.
 It automatically detects all values of define type and provides methods like:
