@@ -1,4 +1,4 @@
-// DO NOT EDIT: auto generated from ddwrap
+// DO NOT EDIT: auto generated from github.com/Armatorix/enumgen
 
 package example
 
