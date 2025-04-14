@@ -34,7 +34,7 @@ func (e *{{ .EnumName }}) UnmarshalJSON(data []byte) error {
         *e = v
         return nil
     }
-    return fmt.Errorf("Unknown {{ .EnumName }} value: %s", s)
+    return fmt.Errorf("Unknown {{ .EnumName }} value: %s; %w", s, Err{{ .EnumName }}MissingValue)
 }
 
 func {{ .EnumName}}Values() []{{ .EnumName }} {
@@ -55,11 +55,11 @@ func (e {{ .EnumName }}) Value() (driver.Value, error) {
     return e.String(), nil
 }
 
-var ErrMissingValue = errors.New("missing value")
+var Err{{ .EnumName }}MissingValue = errors.New("missing value")
 
 func (e *{{ .EnumName }}) Scan(value interface{}) error {
     if value == nil {
-        return ErrMissingValue
+        return Err{{ .EnumName }}MissingValue
     }
     switch v := value.(type) {
     case []byte:

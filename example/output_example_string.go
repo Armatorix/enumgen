@@ -86,10 +86,11 @@ func (e *StringConstType) Scan(value interface{}) error {
 	case string:
 		return e.UnmarshalJSON([]byte(v))
 	case int64:
-		*e, ok = StringConstType(v)
+		tmp, ok = v.(StringConstType)
 		if !ok {
 			return fmt.Errorf("Unknown StringConstType value: %+v", v)
 		}
+		*e = tmp
 		return nil
 
 	default:

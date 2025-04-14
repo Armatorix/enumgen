@@ -81,10 +81,11 @@ func (e *IOTAConstType) Scan(value interface{}) error {
 	case string:
 		return e.UnmarshalJSON([]byte(v))
 	case int64:
-		*e, ok = IOTAConstType(v)
+		tmp, ok = v.(IOTAConstType)
 		if !ok {
 			return fmt.Errorf("Unknown IOTAConstType value: %+v", v)
 		}
+		*e = tmp
 		return nil
 
 	default:

@@ -1,6 +1,6 @@
-//go:generate go run github.com/Armatorix/enumgen@v0.0.3 input_example.go output_example_string.go StringConstType
-//go:generate go run github.com/Armatorix/enumgen@v0.0.3 input_example.go output_example_int.go IntConstType
-//go:generate go run github.com/Armatorix/enumgen@v0.0.3 input_example.go output_example_iota.go IOTAConstType
+//go:generate go run github.com/Armatorix/enumgen@f75de5d943d378840d7dd6453d08156e7c6bf624 input_example.go output_example_string.go StringConstType
+//go:generate go run github.com/Armatorix/enumgen@f75de5d943d378840d7dd6453d08156e7c6bf624 input_example.go output_example_int.go IntConstType
+//go:generate go run github.com/Armatorix/enumgen@f75de5d943d378840d7dd6453d08156e7c6bf624 input_example.go output_example_iota.go IOTAConstType
 
 package example
 
