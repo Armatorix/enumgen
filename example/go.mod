@@ -2,7 +2,7 @@ module example
 
 go 1.23.2
 
-require github.com/Armatorix/enumgen v0.0.1
+require github.com/Armatorix/enumgen v0.0.2
 
 require (
 	golang.org/x/mod v0.22.0 // indirect
