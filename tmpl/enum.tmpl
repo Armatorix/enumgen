@@ -2,6 +2,16 @@
 
 package {{ .PackageName }}
 
+var {{ .EnumName }}ToString = map[{{ .EnumName }}]string{
+    {{ range .Values }}{{ . }}: "{{ . }}",
+    {{ end }}
+}
+
+var StringTo{{ .EnumName }} = map[string]{{ .EnumName }}{
+    {{ range .Values }}"{{ . }}": {{ . }},
+    {{ end }}
+}
+
 func (e {{ .EnumName }}) String() string {
     switch e {
     {{ range .Values }}case {{ . }}:
@@ -20,13 +30,11 @@ func (e *{{ .EnumName }}) UnmarshalJSON(data []byte) error {
     if err := json.Unmarshal(data, &s); err != nil {
         return err
     }
-    switch s {
-    {{ range .Values }}case "{{ . }}":
-        *e = {{ . }}
-    {{ end }}default:
-        return fmt.Errorf("Unknown {{ .EnumName }} value: %+v", s)
+    if v, ok := StringTo{{ .EnumName }}[s]; ok {
+        *e = v
+        return nil
     }
-    return nil
+    return fmt.Errorf("Unknown {{ .EnumName }} value: %s", s)
 }
 
 func {{ .EnumName}}Values() []{{ .EnumName }} {
@@ -37,12 +45,8 @@ func {{ .EnumName}}Values() []{{ .EnumName }} {
 }
 
 func (e {{ .EnumName }}) IsValid() bool {
-    switch e {
-    {{ range .Values }}case {{ . }}:
-        return true
-    {{ end }}default:
-        return false
-    }
+    _, ok := {{ .EnumName }}ToString[e]
+    return ok
 }
 
 // valuer and scanner for database/sql
