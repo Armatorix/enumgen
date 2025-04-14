@@ -51,7 +51,7 @@ func (e *StringConstType) UnmarshalJSON(data []byte) error {
 		*e = v
 		return nil
 	}
-	return fmt.Errorf("Unknown StringConstType value: %s", s)
+	return fmt.Errorf("Unknown StringConstType value: %s; %w", s, ErrStringConstTypeMissingValue)
 }
 
 func StringConstTypeValues() []StringConstType {
@@ -74,25 +74,17 @@ func (e StringConstType) Value() (driver.Value, error) {
 	return e.String(), nil
 }
 
-var ErrMissingValue = errors.New("missing value")
+var ErrStringConstTypeMissingValue = errors.New("missing value")
 
 func (e *StringConstType) Scan(value interface{}) error {
 	if value == nil {
-		return ErrMissingValue
+		return ErrStringConstTypeMissingValue
 	}
 	switch v := value.(type) {
 	case []byte:
 		return e.UnmarshalJSON(v)
 	case string:
 		return e.UnmarshalJSON([]byte(v))
-	case int64:
-		tmp, ok = v.(StringConstType)
-		if !ok {
-			return fmt.Errorf("Unknown StringConstType value: %+v", v)
-		}
-		*e = tmp
-		return nil
-
 	default:
 		return fmt.Errorf("Unsupported type: %T", v)
 	}

@@ -47,7 +47,7 @@ func (e *IOTAConstType) UnmarshalJSON(data []byte) error {
 		*e = v
 		return nil
 	}
-	return fmt.Errorf("Unknown IOTAConstType value: %s", s)
+	return fmt.Errorf("Unknown IOTAConstType value: %s; %w", s, ErrIOTAConstTypeMissingValue)
 }
 
 func IOTAConstTypeValues() []IOTAConstType {
@@ -69,25 +69,17 @@ func (e IOTAConstType) Value() (driver.Value, error) {
 	return e.String(), nil
 }
 
-var ErrMissingValue = errors.New("missing value")
+var ErrIOTAConstTypeMissingValue = errors.New("missing value")
 
 func (e *IOTAConstType) Scan(value interface{}) error {
 	if value == nil {
-		return ErrMissingValue
+		return ErrIOTAConstTypeMissingValue
 	}
 	switch v := value.(type) {
 	case []byte:
 		return e.UnmarshalJSON(v)
 	case string:
 		return e.UnmarshalJSON([]byte(v))
-	case int64:
-		tmp, ok = v.(IOTAConstType)
-		if !ok {
-			return fmt.Errorf("Unknown IOTAConstType value: %+v", v)
-		}
-		*e = tmp
-		return nil
-
 	default:
 		return fmt.Errorf("Unsupported type: %T", v)
 	}

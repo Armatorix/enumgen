@@ -66,14 +66,6 @@ func (e *{{ .EnumName }}) Scan(value interface{}) error {
         return e.UnmarshalJSON(v)
     case string:
         return e.UnmarshalJSON([]byte(v))
-    case int64:
-        tmp, ok = v.({{ .EnumName }})
-        if !ok {
-            return fmt.Errorf("Unknown {{ .EnumName }} value: %+v", v)
-        }
-        *e = tmp
-        return nil
-    
     default:
         return fmt.Errorf("Unsupported type: %T", v)
     }
