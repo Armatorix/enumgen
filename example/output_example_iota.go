@@ -3,9 +3,23 @@
 package example
 
 import (
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
+
+var IOTAConstTypeToString = map[IOTAConstType]string{
+	Const7: "Const7",
+	Const8: "Const8",
+	Const9: "Const9",
+}
+
+var StringToIOTAConstType = map[string]IOTAConstType{
+	"Const7": Const7,
+	"Const8": Const8,
+	"Const9": Const9,
+}
 
 func (e IOTAConstType) String() string {
 	switch e {
@@ -29,17 +43,11 @@ func (e *IOTAConstType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	switch s {
-	case "Const7":
-		*e = Const7
-	case "Const8":
-		*e = Const8
-	case "Const9":
-		*e = Const9
-	default:
-		return fmt.Errorf("Unknown IOTAConstType value: %+v", s)
+	if v, ok := StringToIOTAConstType[s]; ok {
+		*e = v
+		return nil
 	}
-	return nil
+	return fmt.Errorf("Unknown IOTAConstType value: %s", s)
 }
 
 func IOTAConstTypeValues() []IOTAConstType {
@@ -51,14 +59,35 @@ func IOTAConstTypeValues() []IOTAConstType {
 }
 
 func (e IOTAConstType) IsValid() bool {
-	switch e {
-	case Const7:
-		return true
-	case Const8:
-		return true
-	case Const9:
-		return true
+	_, ok := IOTAConstTypeToString[e]
+	return ok
+}
+
+// valuer and scanner for database/sql
+
+func (e IOTAConstType) Value() (driver.Value, error) {
+	return e.String(), nil
+}
+
+var ErrMissingValue = errors.New("missing value")
+
+func (e *IOTAConstType) Scan(value interface{}) error {
+	if value == nil {
+		return ErrMissingValue
+	}
+	switch v := value.(type) {
+	case []byte:
+		return e.UnmarshalJSON(v)
+	case string:
+		return e.UnmarshalJSON([]byte(v))
+	case int64:
+		*e, ok = IOTAConstType(v)
+		if !ok {
+			return fmt.Errorf("Unknown IOTAConstType value: %+v", v)
+		}
+		return nil
+
 	default:
-		return false
+		return fmt.Errorf("Unsupported type: %T", v)
 	}
 }

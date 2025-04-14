@@ -67,10 +67,11 @@ func (e *{{ .EnumName }}) Scan(value interface{}) error {
     case string:
         return e.UnmarshalJSON([]byte(v))
     case int64:
-        *e, ok = {{ .EnumName }}(v)
+        tmp, ok = v.({{ .EnumName }})
         if !ok {
             return fmt.Errorf("Unknown {{ .EnumName }} value: %+v", v)
         }
+        *e = tmp
         return nil
     
     default:

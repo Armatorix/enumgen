@@ -3,9 +3,23 @@
 package example
 
 import (
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
+
+var IntConstTypeToString = map[IntConstType]string{
+	Const4: "Const4",
+	Const5: "Const5",
+	Const6: "Const6",
+}
+
+var StringToIntConstType = map[string]IntConstType{
+	"Const4": Const4,
+	"Const5": Const5,
+	"Const6": Const6,
+}
 
 func (e IntConstType) String() string {
 	switch e {
@@ -29,17 +43,11 @@ func (e *IntConstType) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	switch s {
-	case "Const4":
-		*e = Const4
-	case "Const5":
-		*e = Const5
-	case "Const6":
-		*e = Const6
-	default:
-		return fmt.Errorf("Unknown IntConstType value: %+v", s)
+	if v, ok := StringToIntConstType[s]; ok {
+		*e = v
+		return nil
 	}
-	return nil
+	return fmt.Errorf("Unknown IntConstType value: %s", s)
 }
 
 func IntConstTypeValues() []IntConstType {
@@ -51,14 +59,35 @@ func IntConstTypeValues() []IntConstType {
 }
 
 func (e IntConstType) IsValid() bool {
-	switch e {
-	case Const4:
-		return true
-	case Const5:
-		return true
-	case Const6:
-		return true
+	_, ok := IntConstTypeToString[e]
+	return ok
+}
+
+// valuer and scanner for database/sql
+
+func (e IntConstType) Value() (driver.Value, error) {
+	return e.String(), nil
+}
+
+var ErrMissingValue = errors.New("missing value")
+
+func (e *IntConstType) Scan(value interface{}) error {
+	if value == nil {
+		return ErrMissingValue
+	}
+	switch v := value.(type) {
+	case []byte:
+		return e.UnmarshalJSON(v)
+	case string:
+		return e.UnmarshalJSON([]byte(v))
+	case int64:
+		*e, ok = IntConstType(v)
+		if !ok {
+			return fmt.Errorf("Unknown IntConstType value: %+v", v)
+		}
+		return nil
+
 	default:
-		return false
+		return fmt.Errorf("Unsupported type: %T", v)
 	}
 }
